@@ -16,15 +16,15 @@ struct ContentView: View {
         VStack {
             VStack {
                 HStack {
-                    ScrollingText(old: 70, new: 105, animationDelay: 1);
-                    Text("%")
+                    ScrollingText(old: 70, new: 100, animationDelay: 1)
+                    Text("score")
                 }
                 HStack {
-                    ScrollingText(old: 80, new: 92, animationDelay: 2);
+                    ScrollingText(old: 7.3, new: 9.4, step: 0.1, animationDelay: 2)
                     Text("hours")
                 }
                 HStack {
-                    ScrollingText(old: 97, new: 87, animationDelay: 3);
+                    ScrollingText(old: 98, new: 83, animationDelay: 3)
                     Text("%")
                 }
             }
@@ -33,32 +33,51 @@ struct ContentView: View {
     
     struct ScrollingText: View {
         private var viewHeight: CGFloat;
-        private var old: Int;
-        private var new: Int;
+        private var old: String;
+        private var new: String;
+        private var values: Array<String> = [];
         private var animationDelay: Int;
         private var animationDuration: Double;
         
-        public init (viewHeight: CGFloat = 50, old: Int = 0, new: Int = 10, animationDelay: Int = 1, animationDuration: Double = 4.0) {
+        public init (viewHeight: CGFloat = 50, old: Int = 0, new: Int = 10, step: Int = 1, animationDelay: Int = 1, animationDuration: Double = 4.0) {
             self.viewHeight = viewHeight;
-            self.old = old;
-            self.new = new;
+            self.old = String(old);
+            self.new = String(new);
             self.animationDelay = animationDelay;
             self.animationDuration = animationDuration;
+            
+            let lower = min(old, new)
+            let higher = max(old, new)
+            
+            for i in stride(from: lower, through: higher, by: step).reversed() {
+                values.append(String(i))
+            }
         }
         
+        public init (viewHeight: CGFloat = 50, old: Double = 0.0, new: Double = 10.0, step: Double = 0.1, animationDelay: Int = 1, animationDuration: Double = 4.0) {
+            self.viewHeight = viewHeight;
+            self.old = String(format: "%.1f", old);
+            self.new = String(format: "%.1f", new);
+            self.animationDelay = animationDelay;
+            self.animationDuration = animationDuration;
+            
+            let lower = min(old, new)
+            let higher = max(old, new)
+            
+            for i in stride(from: lower, through: higher, by: step).reversed() {
+                values.append(String(format: "%.1f", i))
+            }
+        }
         
         var body: some View {
             ScrollViewReader { proxy in
                 ScrollView {
                     VStack {
-                        let lower = old > new ? new : old;
-                        let higher = old > new ? old : new;
-                        
-                        ForEach(lower...higher, id: \.self) { index in
-                            Text("\(index)")
+                        ForEach(values, id: \.self) { index in
+                            Text(index)
                                 .id(index)
-                                .frame(width: .infinity, height: viewHeight)
-                                .font(Font.system(size:35))
+                                .frame(minHeight: viewHeight, maxHeight: viewHeight)
+                                .font(Font.system(size: 35))
                                 .fontWeight(Font.Weight.black)
                         }
                     }
